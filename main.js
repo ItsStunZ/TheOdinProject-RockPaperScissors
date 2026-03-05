@@ -1,5 +1,17 @@
+const BUTTONS = document.querySelectorAll('.choiceBtn');
+const RESULTS = document.querySelector(".results");
+
+const PLAYER_RESULTS = document.querySelector('.player-results');
+const COMPUTER_RESULTS = document.querySelector('.computer-results');
+const ROUND_WINNER = document.querySelector('.round-winner');
+
+const END_RESULTS = document.querySelector('.end-results');
+const WINNER = document.querySelector(".winner");
+
 let humanScore = 0;
 let computerScore = 0;
+
+const pointsToWin = 5;
 
 function getComputerChoice() {
     const choices = ["rock", "paper", "scissors"];
@@ -13,53 +25,80 @@ function getHumanChoice()
     return userInput;
 }
 
+function displayResult(human, computer) {
+    PLAYER_RESULTS.textContent = `You: ${human}`;
+    COMPUTER_RESULTS.textContent = `Computer: ${computer}`;
+}
+
 function playRound(humanChoice, computerChoice) {
-    humanChoice.toLowerCase(); // Set humandChoice to all lowercase
+    let humandChoiceLower = humanChoice.toLowerCase();
+
+    // Display what the player and computer chose
+    displayResult(humandChoiceLower, computerChoice);
+
 
     // Rock > Scissors
     // Scissors > Paper
     // Paper > Rock
 
-    if (humanChoice === "rock" && computerChoice === "scissors") {
-        console.log("You win! Rock beats Scissors");
+    if (humandChoiceLower === "rock" && computerChoice === "scissors") {
+        ROUND_WINNER.textContent = "You win! Rock beats Scissors";
         humanScore++;
-    } else if (humanChoice === "scissors" && computerChoice === "paper") {
-        console.log("You win! Scissors beats Paper");
+    } else if (humandChoiceLower === "scissors" && computerChoice === "paper") {
+        ROUND_WINNER.textContent = "You win! Scissors beats Paper";
         humanScore++;
-    } else if (humanChoice === "paper" && computerChoice === "rock") {
-        console.log("You win! Paper beats Rock");
+    } else if (humandChoiceLower === "paper" && computerChoice === "rock") {
+        ROUND_WINNER.textContent = "You win! Paper beats Rock";
         humanScore++;
     }
 
-    if (computerChoice === "rock" && humanChoice === "scissors") {
-        console.log("You lose! Rock beats Scissors");
+    if (computerChoice === "rock" && humandChoiceLower === "scissors") {
+        ROUND_WINNER.textContent = "You lose! Rock beats Scissors";
         computerScore++;
-    } else if (computerChoice === "scissors" && humanChoice === "paper") {
-        console.log("You lose! Scissors beats Paper");
+    } else if (computerChoice === "scissors" && humandChoiceLower === "paper") {
+        ROUND_WINNER.textContent = "You lose! Scissors beats Paper";
         computerScore++;
-    } else if (computerChoice === "paper" && humanChoice === "rock") {
-        console.log("You lose! Paper beats Rock");
+    } else if (computerChoice === "paper" && humandChoiceLower === "rock") {
+        ROUND_WINNER.textContent = "You lose! Paper beats Rock";
         computerScore++;
     }
+
+    console.log(`Player Score: ${humanScore}`);
+    console.log(`Computer Score: ${computerScore}`);
 }
 
+function endGame(winner) {
+    // Remove buttons
+    BUTTONS.forEach((button) => {
+        button.remove();
+    })
 
-function playGame() {
-    let count = 0;
-    while (count < 5) {
-        const humanSelection = getHumanChoice();
+
+    // Display the winner
+    WINNER.textContent = `Winner: ${winner}`
+
+    // Display score
+    let unorderedList = document.createElement('ul');
+    unorderedList.innerHTML = `
+        <li>Player: ${humanScore}</li>
+        <li>Computer: ${computerScore}</li>
+    `
+    END_RESULTS.appendChild(unorderedList);
+}
+
+// loop through the buttons array
+BUTTONS.forEach((button) => {   
+    button.addEventListener('click', function() {
         const computerSelection = getComputerChoice();
+        playRound(button.textContent, computerSelection);
 
-        playRound(humanSelection, computerSelection);
-        count++;
-    }
-
-    // Check for winner
-    if (humanScore > computerScore) {
-        alert("YOU WIN! PlayerScore: " + humanScore + " ComputerScore: " + computerScore);
-    } else {
-        alert("YOU LOSE! PlayerScore: " + humanScore + " ComputerScore: " + computerScore);
-    }
-}
-
-playGame();
+        // check if player or computer have won
+        if (humanScore >= pointsToWin) {
+            // Player wins
+            endGame('Player');
+        } else if (computerScore >= pointsToWin) {
+            // Computer wins
+            endGame('Computer');
+        }
+    })
+})
